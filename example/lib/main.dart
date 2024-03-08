@@ -16,7 +16,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  SerialAndroidBluetooth serialBLT = SerialAndroidBluetooth("ESP32");
+  SerialAndroidBluetooth serialBLT = SerialAndroidBluetooth(name: "ESP32");
   @override
   void initState() {
     // TODO: implement initState

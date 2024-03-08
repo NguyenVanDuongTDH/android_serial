@@ -6,9 +6,13 @@ import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:serial/serial.dart';
 
 class SerialAndroidBluetooth extends SerialClient {
-  String name;
+  String? _name;
+  String? _address;
+
   BluetoothConnection? _serial;
-  SerialAndroidBluetooth(this.name);
+  SerialAndroidBluetooth({String? name, String? address})
+      : _name = name,
+        _address = address;
   @override
   void add(Uint8List datas) {
     _serial!.output.add(datas);
@@ -23,16 +27,23 @@ class SerialAndroidBluetooth extends SerialClient {
 
   @override
   Future<bool> connect() async {
-    final devices = await FlutterBluetoothSerial.instance.getBondedDevices();
-    for (var i = 0; i < devices.length; i++) {
-      print(devices[i].name);
-      if (devices[i].name == name) {
-        _serial = await BluetoothConnection.toAddress(devices[i].address);
-        break;
+    try {
+      if (_address != null) {
+        _serial = await BluetoothConnection.toAddress(_address);
+      } else {
+        final devices =
+            await FlutterBluetoothSerial.instance.getBondedDevices();
+        for (var i = 0; i < devices.length; i++) {
+          if (devices[i].name == _name) {
+            _serial = await BluetoothConnection.toAddress(devices[i].address);
+            break;
+          }
+        }
       }
+      return true;
+    } catch (e) {
+      return false;
     }
-
-    return true;
   }
 
   @override
